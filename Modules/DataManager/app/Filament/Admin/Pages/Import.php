@@ -334,9 +334,18 @@ class Import extends Page implements HasForms
             }
 
             // Resolve relative paths against the storage directory
-            if ($path && ! str_starts_with($path, DIRECTORY_SEPARATOR)) {
+            if ($path && ! str_starts_with($path, DIRECTORY_SEPARATOR) && ! preg_match('/^[A-Za-z]:[\\/\\\\]/', $path)) {
                 $path = storage_path('app/'.$path);
             }
+
+            // ADD THIS BLOCK HERE ↓
+            \Log::debug('IMPORT DEBUG', [
+                'state_type' => gettype($state),
+                'state_class' => is_object($state) ? get_class($state) : 'not_object',
+                'resolved_path' => $path,
+                'file_exists' => $path ? file_exists($path) : false,
+            ]);
+            // ADD THIS BLOCK HERE ↑
 
             if (! $path || ! file_exists($path)) {
                 $this->addError('upload_file', 'Could not read the uploaded file.');

@@ -214,7 +214,7 @@ class Implementation extends Model
     {
         return LogOptions::defaults()
             ->logOnly(['title', 'details', 'status', 'effectiveness', 'notes', 'test_procedure'])
-            ->logOnlyDirty()
-            ->dontLogEmptyChanges();
+            ->logOnlyDirty();
+            /* REMOVED LINE FROM HERE */
     }
 }

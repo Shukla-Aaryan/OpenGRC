@@ -316,6 +316,13 @@ class Import extends Page implements HasForms
 
     protected function parseUploadedFile(mixed $state): void
     {
+        /*
+        CODE USED FOR DEBUGGING 
+        \Log::info('parseUploadedFile STARTED', [
+        'state_type' => gettype($state),
+        'state' => $state,
+        ]);
+        */
         try {
             // Handle different state types from Filament FileUpload
             $path = null;
@@ -334,9 +341,26 @@ class Import extends Page implements HasForms
             }
 
             // Resolve relative paths against the storage directory
-            if ($path && ! str_starts_with($path, DIRECTORY_SEPARATOR) && ! preg_match('/^[A-Za-z]:[\\/\\\\]/', $path)) {
+            // if ($path && ! str_starts_with($path, DIRECTORY_SEPARATOR) && ! preg_match('/^[A-Za-z]:[\\/\\\\]/', $path)) {
+            /*
+            if ($path && ! str_starts_with($path, DIRECTORY_SEPARATOR)) {
                 $path = storage_path('app/'.$path);
             }
+            */
+            if (
+              $path &&
+              ! str_starts_with($path, DIRECTORY_SEPARATOR) &&
+              ! preg_match('/^[A-Za-z]:\\\\/', $path)
+            ) {
+              $path = storage_path('app/'.$path);
+            }
+            /*
+            CODE USED FOR DEBUGGING
+            \Log::info('Resolved upload path', [
+            'path' => $path,
+            'exists' => $path ? file_exists($path) : false,
+            ]);
+            */
 
             // ADD THIS BLOCK HERE ↓
             \Log::debug('IMPORT DEBUG', [
@@ -375,6 +399,15 @@ class Import extends Page implements HasForms
 
             $this->resetErrorBag('upload_file');
         } catch (\Exception $e) {
+            /*
+            CODE USED FOR DEBUGGING
+            \Log::error('IMPORT ERROR', [
+                'message' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+            */
             $this->addError('upload_file', 'Error parsing file: '.$e->getMessage());
         }
     }
